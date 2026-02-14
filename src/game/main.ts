@@ -1,9 +1,10 @@
 import { startGameLoop, keys, Rect, rectsOverlap } from "./engine";
 import { createPlayer, updatePlayer, Player } from "./player";
 import { LEVELS } from "./levels";
-import { drawPlayer, drawPlatform, drawDoor, drawPrincess, drawHeart, drawCRT, COLORS } from "./renderer";
+import { drawPlayer, drawPlatform, drawDoor, drawPrincess, drawSpike, drawCRT, COLORS } from "./renderer";
 import { drawStartScreen, drawDeathScreen, drawLevelIntro, drawLevelClear, drawHUD, drawFinale, DEATH_MESSAGES } from "./ui";
-import { initAudio, sfxJump, sfxDeath, sfxDoorReach, sfxLevelClear } from "./sound";
+import { initAudio, sfxDeath, sfxDoorReach, sfxLevelClear } from "./sound";
+import { initTraps, updateTraps, TrapState } from "./traps";
 
 // ── Constants ────────────────────────────────────────────────────────
 const GAME_W = 480;
@@ -40,6 +41,7 @@ let audioInitialized = false;
 let player: Player = createPlayer(0, 0);
 let platforms: Rect[] = [];
 let doorPos = { x: 0, y: 0 };
+let trapStates: TrapState[] = [];
 
 // Princess animation frame
 let princessAnimTimer = 0;
@@ -65,6 +67,9 @@ function loadLevel(index: number) {
 
   // Copy door position
   doorPos = { ...level.doorPos };
+
+  // Initialize traps
+  trapStates = initTraps(LEVELS[index].traps);
 
   // Reset state timer
   stateTimer = 0;
@@ -139,6 +144,13 @@ startGameLoop(
       case "playing": {
         // Update player physics
         updatePlayer(player, dt, platforms);
+
+        // Update traps
+        const trapResult = updateTraps(trapStates, player, platforms, doorPos, dt);
+        doorPos = trapResult.doorPos;
+        if (trapResult.killedPlayer) {
+          player.alive = false;
+        }
 
         // Update princess animation
         princessAnimTimer += dt;
@@ -246,6 +258,29 @@ startGameLoop(
           drawPlatform(ctx, p);
         }
 
+        // Draw spikes from traps
+        for (const trap of trapStates) {
+          if (trap.def.type === "spike" && trap.spikeOut) {
+            drawSpike(ctx, trap.def.rect.x, trap.def.rect.y, true);
+          }
+          // Shaking platforms (collapse warning)
+          if (trap.shaking && !trap.collapsed) {
+            const shakeX = (Math.random() - 0.5) * 3;
+            const shakeY = (Math.random() - 0.5) * 2;
+            ctx.save();
+            ctx.translate(shakeX, shakeY);
+            drawPlatform(ctx, trap.def.rect);
+            ctx.restore();
+          }
+          // Fake exit "Tebrikler!" text
+          if (trap.def.type === "fakeExit" && trap.triggered && !trap.collapsed) {
+            ctx.fillStyle = COLORS.gold;
+            ctx.font = "bold 14px monospace";
+            ctx.textAlign = "center";
+            ctx.fillText("Tebrikler!", GAME_W / 2, GAME_H / 2 - 20);
+          }
+        }
+
         // Draw door (closed — opens on reach, but we transition away)
         drawDoor(ctx, doorPos.x, doorPos.y, false);
 
@@ -267,6 +302,26 @@ startGameLoop(
         // Draw the level behind the death overlay
         for (const p of platforms) {
           drawPlatform(ctx, p);
+        }
+        // Draw traps in dead state so level stays visible
+        for (const trap of trapStates) {
+          if (trap.def.type === "spike" && trap.spikeOut) {
+            drawSpike(ctx, trap.def.rect.x, trap.def.rect.y, true);
+          }
+          if (trap.shaking && !trap.collapsed) {
+            const shakeX = (Math.random() - 0.5) * 3;
+            const shakeY = (Math.random() - 0.5) * 2;
+            ctx.save();
+            ctx.translate(shakeX, shakeY);
+            drawPlatform(ctx, trap.def.rect);
+            ctx.restore();
+          }
+          if (trap.def.type === "fakeExit" && trap.triggered && !trap.collapsed) {
+            ctx.fillStyle = COLORS.gold;
+            ctx.font = "bold 14px monospace";
+            ctx.textAlign = "center";
+            ctx.fillText("Tebrikler!", GAME_W / 2, GAME_H / 2 - 20);
+          }
         }
         drawDoor(ctx, doorPos.x, doorPos.y, false);
         drawPrincess(ctx, doorPos.x - 18, doorPos.y - 2, princessAnimFrame);
