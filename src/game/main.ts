@@ -1,3 +1,5 @@
+import { startGameLoop, keys } from "./engine";
+
 const GAME_W = 480;
 const GAME_H = 270;
 
@@ -16,9 +18,21 @@ function resize() {
 resize();
 window.addEventListener("resize", resize);
 
-ctx.fillStyle = "#1a1a2e";
-ctx.fillRect(0, 0, GAME_W, GAME_H);
-ctx.fillStyle = "#e8b4c8";
-ctx.font = "16px monospace";
-ctx.textAlign = "center";
-ctx.fillText("Işıl'a Ulaş — Yükleniyor...", GAME_W / 2, GAME_H / 2);
+let px = GAME_W / 2;
+let py = GAME_H / 2;
+
+startGameLoop(ctx,
+  (dt) => {
+    const speed = 120;
+    if (keys["ArrowLeft"] || keys["KeyA"]) px -= speed * dt;
+    if (keys["ArrowRight"] || keys["KeyD"]) px += speed * dt;
+    if (keys["ArrowUp"] || keys["KeyW"]) py -= speed * dt;
+    if (keys["ArrowDown"] || keys["KeyS"]) py += speed * dt;
+  },
+  (ctx) => {
+    ctx.fillStyle = "#1a1a2e";
+    ctx.fillRect(0, 0, GAME_W, GAME_H);
+    ctx.fillStyle = "#e8b4c8";
+    ctx.fillRect(px - 8, py - 8, 16, 16);
+  }
+);
