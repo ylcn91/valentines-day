@@ -111,8 +111,8 @@ export function drawDeathScreen(
 ): void {
   ctx.save();
 
-  // Semi-transparent dark overlay
-  ctx.fillStyle = "rgba(10, 10, 20, 0.75)";
+  // Semi-transparent warm overlay
+  ctx.fillStyle = "rgba(242, 232, 220, 0.85)";
   ctx.fillRect(0, 0, w, h);
 
   ctx.textAlign = "center";
@@ -213,7 +213,7 @@ export function drawLevelClear(
   ctx.save();
 
   // Background overlay
-  ctx.fillStyle = "rgba(10, 10, 20, 0.7)";
+  ctx.fillStyle = "rgba(242, 232, 220, 0.8)";
   ctx.fillRect(0, 0, w, h);
 
   ctx.globalAlpha = Math.min(1, progress);
@@ -221,7 +221,7 @@ export function drawLevelClear(
   ctx.textBaseline = "middle";
 
   // Celebration text
-  ctx.fillStyle = COLORS.gold;
+  ctx.fillStyle = COLORS.playerHeart;
   ctx.font = "bold 13px monospace";
   ctx.fillText("B\u00D6L\u00DCM " + levelNum + " TAMAMLANDI!", w / 2, h / 2 - 10);
 

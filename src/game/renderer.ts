@@ -3,19 +3,19 @@ import { Player } from "./player";
 
 // ── Color constants (Level Devil minimal + Valentine palette) ────────
 export const COLORS = {
-  bg: "#16161a",
+  bg: "#f2e8dc",
   platform: "#c4697a",
   platformLight: "#d4849a",
-  player: "#e8b4c8",
+  player: "#2d2d3a",
   playerHeart: "#e05577",
-  gold: "#f0c888",
+  gold: "#d4a054",
   princess: "#d4849a",
   spike: "#8b3a4a",
   door: "#a0785a",
   doorFrame: "#8b6f4e",
-  doorOpen: "#0d0d1a",
-  text: "#f5e6d3",
-  textDim: "rgba(245,230,211,0.5)",
+  doorOpen: "#3a3028",
+  text: "#2d2d3a",
+  textDim: "rgba(45,45,58,0.5)",
 };
 
 // Pixel size: we use 2x2 "big pixels" for visibility at 480x270
