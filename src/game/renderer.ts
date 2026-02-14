@@ -65,51 +65,51 @@ const PLAYER_PALETTE: Palette = {
   H: COLORS.playerHeart,
 };
 
-// Standing frame
+// Standing frame — legs together, idle
 const PLAYER_STAND: string[] = [
   "..BBB..",  // head
   "..BBB..",
-  ".BBBBB.",  // body (wider)
+  ".BBBBB.",  // body
   ".BBHBB.",  // chest with heart
   ".BBBBB.",  // torso
-  "..B.B..",  // legs apart
-  "..B.B..",
+  "..BBB..",  // hips
+  "..B.B..",  // legs
   "..B.B..",
 ];
 
-// Walk frame 1 (left step)
+// Walk frame 1 — left leg forward, right leg back
 const PLAYER_WALK_L: string[] = [
   "..BBB..",
   "..BBB..",
   ".BBBBB.",
   ".BBHBB.",
   ".BBBBB.",
-  ".B...B.",  // wider step
-  ".B...B.",
-  ".B...B.",
+  "..BBB..",
+  ".BB..B.",  // left leg forward
+  "BB...BB",  // wide stride
 ];
 
-// Walk frame 2 (right step / legs close)
+// Walk frame 2 — legs passing (together)
 const PLAYER_WALK_R: string[] = [
   "..BBB..",
   "..BBB..",
   ".BBBBB.",
   ".BBHBB.",
   ".BBBBB.",
-  "...BB..",  // legs together mid-step
-  "...BB..",
-  "...BB..",
+  "..BBB..",
+  "..B.BB.",  // right leg forward
+  "..B..BB",  // wide stride
 ];
 
-// Jump pose (legs together, tucked)
+// Jump pose — legs tucked up
 const PLAYER_JUMP: string[] = [
   "..BBB..",
   "..BBB..",
   ".BBBBB.",
   ".BBHBB.",
   ".BBBBB.",
-  "..BBB..",  // legs together
-  "..B.B..",
+  "..BBB..",
+  "..BBB..",  // legs tucked together
   ".......",
 ];
 

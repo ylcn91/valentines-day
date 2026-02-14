@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Işıl'a Ulaş</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,10 +11,17 @@
       background: #e8ddd0;
       overflow: hidden;
       touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     canvas {
       display: block;
-      margin: 0 auto;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }

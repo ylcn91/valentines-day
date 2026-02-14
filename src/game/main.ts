@@ -15,12 +15,13 @@ const canvas = document.getElementById("game") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
 
 function resize() {
-  const scale = Math.min(window.innerWidth / GAME_W, window.innerHeight / GAME_H);
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const scale = Math.min(vw / GAME_W, vh / GAME_H);
   canvas.width = GAME_W;
   canvas.height = GAME_H;
-  canvas.style.width = `${GAME_W * scale}px`;
-  canvas.style.height = `${GAME_H * scale}px`;
-  canvas.style.marginTop = `${(window.innerHeight - GAME_H * scale) / 2}px`;
+  canvas.style.width = `${Math.floor(GAME_W * scale)}px`;
+  canvas.style.height = `${Math.floor(GAME_H * scale)}px`;
 }
 
 resize();
