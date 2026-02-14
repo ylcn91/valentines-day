@@ -1,4 +1,4 @@
-import { startGameLoop, keys, Rect, rectsOverlap, setupTouchInput, isTouchDevice, touchButtons } from "./engine";
+import { startGameLoop, keys, Rect, rectsOverlap, setupTouchInput } from "./engine";
 import { createPlayer, updatePlayer, Player } from "./player";
 import { LEVELS } from "./levels";
 import { drawPlayer, drawPlatform, drawDoor, drawPrincess, drawSpike, drawCRT, drawHeart, COLORS } from "./renderer";
@@ -26,7 +26,7 @@ function resize() {
 
 resize();
 window.addEventListener("resize", resize);
-setupTouchInput(canvas, GAME_W, GAME_H);
+setupTouchInput(canvas);
 
 // ── Game State ───────────────────────────────────────────────────────
 type GameState = "start" | "levelIntro" | "playing" | "dead" | "levelClear" | "finale";
@@ -353,66 +353,6 @@ startGameLoop(
 
         // Draw HUD
         drawHUD(ctx, currentLevel + 1, deathCount);
-
-        // Draw touch buttons for mobile (keyboard-key style like Level Devil)
-        if (isTouchDevice) {
-          for (const btn of touchButtons) {
-            const bx = btn.x;
-            const by = btn.y;
-            const bw = btn.w;
-            const bh = btn.h;
-
-            // Dark key background
-            ctx.fillStyle = "#2a2a35";
-            ctx.fillRect(bx, by, bw, bh);
-
-            // Lighter top edge (simulates key bevel / border-radius hint)
-            ctx.fillStyle = "#3d3d4a";
-            ctx.fillRect(bx, by, bw, 2);
-            ctx.fillRect(bx, by, 2, bh);
-
-            // Darker bottom-right edge (depth shadow)
-            ctx.fillStyle = "#1a1a22";
-            ctx.fillRect(bx, by + bh - 2, bw, 2);
-            ctx.fillRect(bx + bw - 2, by, 2, bh);
-
-            // Subtle border
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-            ctx.lineWidth = 1;
-            ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
-
-            // Draw pixel arrow icons (white)
-            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-            const cx = bx + bw / 2;
-            const cy = by + bh / 2;
-
-            if (btn.keyCode === "ArrowLeft") {
-              // Left arrow: simple triangle pointing left
-              ctx.beginPath();
-              ctx.moveTo(cx - 5, cy);
-              ctx.lineTo(cx + 3, cy - 5);
-              ctx.lineTo(cx + 3, cy + 5);
-              ctx.closePath();
-              ctx.fill();
-            } else if (btn.keyCode === "ArrowRight") {
-              // Right arrow: simple triangle pointing right
-              ctx.beginPath();
-              ctx.moveTo(cx + 5, cy);
-              ctx.lineTo(cx - 3, cy - 5);
-              ctx.lineTo(cx - 3, cy + 5);
-              ctx.closePath();
-              ctx.fill();
-            } else if (btn.keyCode === "Space") {
-              // Up arrow: simple triangle pointing up (jump)
-              ctx.beginPath();
-              ctx.moveTo(cx, cy - 6);
-              ctx.lineTo(cx - 6, cy + 4);
-              ctx.lineTo(cx + 6, cy + 4);
-              ctx.closePath();
-              ctx.fill();
-            }
-          }
-        }
 
         // Draw CRT overlay on top
         drawCRT(ctx, GAME_W, GAME_H);

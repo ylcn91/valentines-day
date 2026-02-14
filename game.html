@@ -17,6 +17,7 @@
     }
     body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
     }
@@ -25,10 +26,52 @@
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }
+    #touch-controls {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+      padding: 12px 16px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .touch-btn {
+      width: 56px;
+      height: 56px;
+      background: #2a2a35;
+      border: none;
+      border-radius: 6px;
+      color: rgba(255,255,255,0.7);
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 0 #1a1a22;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .touch-btn:active {
+      box-shadow: 0 1px 0 #1a1a22;
+      transform: translateY(2px);
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+    .touch-btn.jump {
+      width: 72px;
+      height: 56px;
+    }
   </style>
 </head>
 <body>
   <canvas id="game"></canvas>
+  <div id="touch-controls">
+    <div class="btn-group">
+      <button class="touch-btn" data-key="ArrowLeft">&#9664;</button>
+      <button class="touch-btn" data-key="ArrowRight">&#9654;</button>
+    </div>
+    <button class="touch-btn jump" data-key="Space">&#9650;</button>
+  </div>
   <script type="module" src="/src/game/main.ts"></script>
 </body>
 </html>
