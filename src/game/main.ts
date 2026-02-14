@@ -106,6 +106,20 @@ function transitionTo(newState: GameState) {
     deathCount++;
     sfxDeath();
     deathKeyReady = false;
+    shakeTimer = 0.3;
+
+    // Spawn death particles at player position
+    for (let i = 0; i < 8; i++) {
+      particles.push({
+        x: player.x + player.w / 2,
+        y: player.y + player.h / 2,
+        vx: (Math.random() - 0.5) * 60,
+        vy: -30 - Math.random() * 50,
+        life: 1.0 + Math.random() * 0.5,
+        maxLife: 1.5,
+        color: Math.random() > 0.5 ? "#e8b4c8" : "#f0c888",
+      });
+    }
   }
 
   if (newState === "levelClear") {
@@ -161,6 +175,12 @@ startGameLoop(
       case "playing": {
         // Update player physics
         updatePlayer(player, dt, platforms);
+
+        // Detect jump and play sound
+        if (wasOnGround && !player.onGround && player.vy < 0) {
+          sfxJump();
+        }
+        wasOnGround = player.onGround;
 
         // Update traps
         const trapResult = updateTraps(trapStates, player, platforms, doorPos, dt);
@@ -241,12 +261,35 @@ startGameLoop(
         break;
       }
     }
+
+    // Update screen shake timer (always, outside switch)
+    if (shakeTimer > 0) shakeTimer -= dt;
+
+    // Update death particles (always, outside switch)
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 40 * dt; // slight gravity
+      p.life -= dt;
+      if (p.life <= 0) particles.splice(i, 1);
+    }
   },
   // DRAW
   (ctx) => {
     // Clear background
     ctx.fillStyle = COLORS.bg;
     ctx.fillRect(0, 0, GAME_W, GAME_H);
+
+    // Screen shake effect
+    if (shakeTimer > 0) {
+      const intensity = shakeTimer / 0.3 * 4;
+      ctx.save();
+      ctx.translate(
+        (Math.random() - 0.5) * intensity,
+        (Math.random() - 0.5) * intensity,
+      );
+    }
 
     switch (state) {
       case "start": {
@@ -387,6 +430,19 @@ startGameLoop(
         drawCRT(ctx, GAME_W, GAME_H);
         break;
       }
+    }
+
+    // Draw death particles (on top of everything)
+    for (const p of particles) {
+      const alpha = Math.max(0, p.life / p.maxLife);
+      ctx.globalAlpha = alpha;
+      drawHeart(ctx, p.x - 4, p.y - 3, 2, p.color);
+    }
+    ctx.globalAlpha = 1;
+
+    // Restore screen shake transform
+    if (shakeTimer > 0) {
+      ctx.restore();
     }
   },
 );
