@@ -74,11 +74,17 @@ export function updatePlayer(p: Player, dt: number, platforms: Rect[]) {
     }
   }
 
-  // Animation
-  p.animTimer += dt;
-  if (p.animTimer > 0.15) {
+  // Animation — only animate legs when moving on ground
+  if (p.vx !== 0 && p.onGround) {
+    p.animTimer += dt;
+    if (p.animTimer > 0.15) {
+      p.animTimer = 0;
+      p.animFrame = (p.animFrame + 1) % 4;
+    }
+  } else {
+    // Standing still or in the air — reset to standing frame
+    p.animFrame = 0;
     p.animTimer = 0;
-    p.animFrame = (p.animFrame + 1) % 4;
   }
 
   // Fall off screen = death
