@@ -1,9 +1,9 @@
-import { startGameLoop, keys, Rect, rectsOverlap } from "./engine";
+import { startGameLoop, keys, Rect, rectsOverlap, setupTouchInput, isTouchDevice, touchButtons } from "./engine";
 import { createPlayer, updatePlayer, Player } from "./player";
 import { LEVELS } from "./levels";
-import { drawPlayer, drawPlatform, drawDoor, drawPrincess, drawSpike, drawCRT, COLORS } from "./renderer";
+import { drawPlayer, drawPlatform, drawDoor, drawPrincess, drawSpike, drawCRT, drawHeart, COLORS } from "./renderer";
 import { drawStartScreen, drawDeathScreen, drawLevelIntro, drawLevelClear, drawHUD, drawFinale, DEATH_MESSAGES } from "./ui";
-import { initAudio, sfxDeath, sfxDoorReach, sfxLevelClear } from "./sound";
+import { initAudio, sfxJump, sfxDeath, sfxDoorReach, sfxLevelClear } from "./sound";
 import { initTraps, updateTraps, TrapState } from "./traps";
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -25,6 +25,7 @@ function resize() {
 
 resize();
 window.addEventListener("resize", resize);
+setupTouchInput(canvas, GAME_W, GAME_H);
 
 // ── Game State ───────────────────────────────────────────────────────
 type GameState = "start" | "levelIntro" | "playing" | "dead" | "levelClear" | "finale";
@@ -46,6 +47,22 @@ let trapStates: TrapState[] = [];
 // Princess animation frame
 let princessAnimTimer = 0;
 let princessAnimFrame = 0;
+
+// Jump sound tracking
+let wasOnGround = false;
+
+// Screen shake
+let shakeTimer = 0;
+
+// Death particles
+interface Particle {
+  x: number; y: number;
+  vx: number; vy: number;
+  life: number;
+  maxLife: number;
+  color: string;
+}
+let particles: Particle[] = [];
 
 // Track whether a keypress happened (for state transitions)
 let anyKeyPressed = false;
@@ -292,6 +309,22 @@ startGameLoop(
 
         // Draw HUD
         drawHUD(ctx, currentLevel + 1, deathCount);
+
+        // Draw touch buttons for mobile
+        if (isTouchDevice) {
+          for (const btn of touchButtons) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+            ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(btn.x, btn.y, btn.w, btn.h);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.font = "16px monospace";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(btn.label, btn.x + btn.w / 2, btn.y + btn.h / 2);
+          }
+        }
 
         // Draw CRT overlay on top
         drawCRT(ctx, GAME_W, GAME_H);
