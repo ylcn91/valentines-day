@@ -53,4 +53,249 @@ export const LEVELS: LevelDef[] = [
     ],
     killZones: [],
   },
+
+  // LEVEL 2: "Kapıyı gördün mü?" — Moving Door
+  {
+    name: "Kapıyı gördün mü?",
+    subtitle: "Kapı nereye gitti?!",
+    playerStart: { x: 20, y: 220 },
+    doorPos: { x: 440, y: 222 },
+    platforms: [
+      // === Floor sections with gaps ===
+      // Left floor (player starts here)
+      { x: 0, y: 250, w: 120, h: 20 },
+      // Gap — must jump
+      // Middle floor section
+      { x: 160, y: 250, w: 80, h: 20 },
+      // Gap — must jump
+      // Right floor section (door starts here)
+      { x: 290, y: 250, w: 90, h: 20 },
+      // Far right floor
+      { x: 400, y: 250, w: 80, h: 20 },
+
+      // === High platforms (for reaching door at position 2: upper-left) ===
+      // Stepping stones going up-left
+      { x: 100, y: 200, w: 50, h: 10 },
+      { x: 40, y: 155, w: 60, h: 10 },
+      // Upper-left platform where door moves first
+      { x: 15, y: 110, w: 70, h: 10 },
+
+      // === Mid-height platforms (for traversal) ===
+      { x: 180, y: 170, w: 60, h: 10 },
+      { x: 280, y: 140, w: 60, h: 10 },
+      { x: 370, y: 170, w: 50, h: 10 },
+
+      // === Lower-right platform (door position 3) ===
+      { x: 340, y: 210, w: 70, h: 10 },
+
+      // === Walls ===
+      { x: 0, y: 0, w: 10, h: 270 },
+      { x: 470, y: 0, w: 10, h: 270 },
+      // Ceiling
+      { x: 0, y: 0, w: 480, h: 10 },
+    ],
+    traps: [
+      // Door moves 3 times! Each triggers sequentially.
+      // Move 1: right floor → upper-left platform
+      { type: "moveDoor", rect: { x: 420, y: 0, w: 60, h: 270 }, target: { x: 30, y: 86 } },
+      // Move 2: upper-left → lower-right platform
+      { type: "moveDoor", rect: { x: 10, y: 0, w: 80, h: 270 }, target: { x: 355, y: 186 } },
+      // Move 3: lower-right → back near original position on far right floor
+      { type: "moveDoor", rect: { x: 330, y: 0, w: 90, h: 270 }, target: { x: 440, y: 226 } },
+
+      // Sneaky spikes in landing zones
+      { type: "spike", rect: { x: 180, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 310, y: 240, w: 12, h: 10 } },
+    ],
+    killZones: [],
+  },
+
+  // LEVEL 3: "Dikkat et!" — Hidden Spikes
+  {
+    name: "Dikkat et!",
+    subtitle: "Görünen köy kılavuz istemez... mi?",
+    playerStart: { x: 20, y: 220 },
+    doorPos: { x: 440, y: 222 },
+    platforms: [
+      // === Floor — looks like one continuous path, but full of spike traps ===
+      // Section 1: safe start
+      { x: 0, y: 250, w: 60, h: 20 },
+      // Section 2: spike zone floor
+      { x: 60, y: 250, w: 40, h: 20 },
+      // Section 3: brief safe
+      { x: 100, y: 250, w: 30, h: 20 },
+      // Section 4: spike zone
+      { x: 130, y: 250, w: 50, h: 20 },
+      // Section 5: spike zone
+      { x: 180, y: 250, w: 40, h: 20 },
+      // Section 6: looks safe, has spike
+      { x: 220, y: 250, w: 40, h: 20 },
+      // Section 7: spike zone
+      { x: 260, y: 250, w: 50, h: 20 },
+      // Section 8: small safe
+      { x: 310, y: 250, w: 30, h: 20 },
+      // Section 9: spike zone
+      { x: 340, y: 250, w: 50, h: 20 },
+      // Section 10: safe end with door
+      { x: 400, y: 250, w: 80, h: 20 },
+
+      // === Upper route — the ACTUAL safe path (less obvious) ===
+      // Player must jump up to these to avoid floor spikes
+      { x: 50, y: 200, w: 45, h: 10 },
+      { x: 120, y: 170, w: 50, h: 10 },
+      { x: 200, y: 145, w: 50, h: 10 },
+      { x: 280, y: 165, w: 50, h: 10 },
+      { x: 360, y: 190, w: 50, h: 10 },
+
+      // === Decoy mid-platforms (some have spikes near edges!) ===
+      { x: 155, y: 210, w: 50, h: 10 },
+      { x: 300, y: 200, w: 50, h: 10 },
+
+      // === Walls ===
+      { x: 0, y: 0, w: 10, h: 270 },
+      { x: 470, y: 0, w: 10, h: 270 },
+      // Ceiling
+      { x: 0, y: 0, w: 480, h: 10 },
+    ],
+    traps: [
+      // === Floor spike traps — the "obvious" path is deadly ===
+      // Walking along the floor triggers these hidden spikes
+      { type: "spike", rect: { x: 70, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 88, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 140, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 158, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 190, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 230, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 275, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 295, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 350, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 370, y: 240, w: 12, h: 10 } },
+
+      // === Spikes on decoy mid-platforms — troll anyone who takes the "shortcut" ===
+      { type: "spike", rect: { x: 160, y: 200, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 338, y: 190, w: 12, h: 10 } },
+    ],
+    killZones: [],
+  },
+
+  // LEVEL 4: "Yukarısı aşağısı" — Gravity Flip
+  {
+    name: "Yukarısı aşağısı",
+    subtitle: "Yerçekimi mi? O da ne?",
+    playerStart: { x: 20, y: 230 },
+    doorPos: { x: 444, y: 10 },
+    platforms: [
+      // === FLOOR (bottom boundary) ===
+      { x: 0, y: 250, w: 260, h: 20 },
+      // Right side floor (transition zone + landing)
+      { x: 260, y: 250, w: 220, h: 20 },
+
+      // === CEILING (top boundary) ===
+      { x: 0, y: 0, w: 480, h: 10 },
+
+      // === Walls ===
+      { x: 0, y: 0, w: 10, h: 270 },
+      { x: 470, y: 0, w: 10, h: 270 },
+
+      // === First half: normal gravity platforming ===
+      // Some platforms to navigate
+      { x: 80, y: 210, w: 50, h: 10 },
+      { x: 160, y: 185, w: 50, h: 10 },
+
+      // === Transition zone (around x=240) ===
+      // Platforms on BOTH floor and ceiling so gravity flip isn't instantly fatal
+      // Floor-side stepping platform
+      { x: 220, y: 200, w: 60, h: 10 },
+      // Ceiling-side platform (player lands here after flip)
+      { x: 220, y: 60, w: 60, h: 10 },
+      { x: 280, y: 40, w: 50, h: 10 },
+
+      // === Second half: upside-down platforms (on the ceiling) ===
+      // Player walks on bottom of these after gravity flips
+      { x: 330, y: 20, w: 50, h: 10 },
+      { x: 390, y: 30, w: 60, h: 10 },
+
+      // === Collapsing ceiling platforms (extra challenge) ===
+      { x: 350, y: 50, w: 40, h: 10 },
+      { x: 420, y: 55, w: 40, h: 10 },
+    ],
+    traps: [
+      // Gravity flip trigger zone in the middle
+      { type: "gravityFlip", rect: { x: 230, y: 100, w: 40, h: 80 } },
+
+      // Collapsing platforms in the upside-down section
+      { type: "collapse", rect: { x: 350, y: 50, w: 40, h: 10 }, delay: 0.4 },
+      { type: "collapse", rect: { x: 420, y: 55, w: 40, h: 10 }, delay: 0.4 },
+    ],
+    killZones: [],
+  },
+
+  // LEVEL 5: "Son adım" — Everything Combined + Fake Exit
+  {
+    name: "Son adım",
+    subtitle: "Her şey burada bitiyor...",
+    playerStart: { x: 20, y: 220 },
+    doorPos: { x: 440, y: 222 },
+    platforms: [
+      // === Start section: collapsing floors ===
+      { x: 0, y: 250, w: 60, h: 20 },
+      // These collapse!
+      { x: 60, y: 250, w: 40, h: 20 },
+      { x: 110, y: 250, w: 40, h: 20 },
+      // Safe landing after collapses
+      { x: 160, y: 250, w: 50, h: 20 },
+
+      // === Middle section: spike gauntlet ===
+      { x: 210, y: 250, w: 120, h: 20 },
+
+      // === Fake exit zone (around x=330) ===
+      // These platforms are near the fake exit and will be removed (within 150px of x~340, y>200)
+      { x: 330, y: 250, w: 80, h: 20 },
+      // Elevated platform with the fake door
+      { x: 320, y: 215, w: 60, h: 10 },
+
+      // === After fake exit: the REAL path ===
+      // Upper platforms for reaching the real door after respawn
+      // Safe platforms far from fake exit
+      { x: 160, y: 195, w: 50, h: 10 },
+      { x: 240, y: 165, w: 50, h: 10 },
+      { x: 330, y: 140, w: 50, h: 10 },
+      { x: 420, y: 115, w: 50, h: 10 },
+
+      // Small platform where real door sits after the moveDoor
+      { x: 430, y: 90, w: 40, h: 10 },
+
+      // Stepping stones to help reach upper area
+      { x: 70, y: 200, w: 40, h: 10 },
+
+      // === Walls ===
+      { x: 0, y: 0, w: 10, h: 270 },
+      { x: 470, y: 0, w: 10, h: 270 },
+      // Ceiling
+      { x: 0, y: 0, w: 480, h: 10 },
+    ],
+    traps: [
+      // === Collapsing floors at the start ===
+      { type: "collapse", rect: { x: 60, y: 250, w: 40, h: 20 }, delay: 0.4 },
+      { type: "collapse", rect: { x: 110, y: 250, w: 40, h: 20 }, delay: 0.4 },
+
+      // === Spikes in the middle gauntlet ===
+      { type: "spike", rect: { x: 225, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 255, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 285, y: 240, w: 12, h: 10 } },
+      { type: "spike", rect: { x: 310, y: 240, w: 12, h: 10 } },
+
+      // === Fake exit — looks like the real door, but it's a trap! ===
+      // Triggers "Tebrikler!" then collapses floor platforms near x=340
+      { type: "fakeExit", rect: { x: 335, y: 218, w: 16, h: 24 } },
+
+      // === After death/respawn: door moves to the real location up high ===
+      // The initial doorPos is at (440, 222) on the right floor.
+      // After the fake exit kills you and floor collapses, on respawn the door
+      // is back at (440, 222) but the floor at that spot may be gone.
+      // A moveDoor moves it to the safe upper platform.
+      { type: "moveDoor", rect: { x: 410, y: 0, w: 70, h: 270 }, target: { x: 440, y: 66 } },
+    ],
+    killZones: [],
+  },
 ];
