@@ -10,12 +10,16 @@ export interface Player {
   gravityDir: 1 | -1; // 1 = normal, -1 = flipped
   animFrame: number;
   animTimer: number;
+  jumpsLeft: number;     // 2 = can jump, 1 = can double jump, 0 = no more jumps
+  jumpPressed: boolean;  // prevent holding jump from auto-double-jumping
+  boostVx: number;       // external velocity from boost pads
 }
 
 const SPEED = 130;
 const JUMP_VEL = -280;
 const GRAVITY = 800;
 const MAX_FALL = 500;
+const MAX_JUMPS = 2;
 
 export function createPlayer(x: number, y: number): Player {
   return {
@@ -25,6 +29,7 @@ export function createPlayer(x: number, y: number): Player {
     facingRight: true,
     gravityDir: 1,
     animFrame: 0, animTimer: 0,
+    jumpsLeft: MAX_JUMPS, jumpPressed: false, boostVx: 0,
   };
 }
 
@@ -36,10 +41,24 @@ export function updatePlayer(p: Player, dt: number, platforms: Rect[]) {
   if (keys["ArrowLeft"] || keys["KeyA"]) { p.vx = -SPEED; p.facingRight = false; }
   if (keys["ArrowRight"] || keys["KeyD"]) { p.vx = SPEED; p.facingRight = true; }
 
-  // Jump
-  if ((keys["Space"] || keys["ArrowUp"] || keys["KeyW"]) && p.onGround) {
+  // Apply boost (decays over time)
+  if (Math.abs(p.boostVx) > 10) {
+    p.vx += p.boostVx;
+    p.boostVx *= 0.92; // friction decay
+  } else {
+    p.boostVx = 0;
+  }
+
+  // Jump / double jump
+  const jumpKey = keys["Space"] || keys["ArrowUp"] || keys["KeyW"];
+  if (jumpKey && !p.jumpPressed && p.jumpsLeft > 0) {
     p.vy = JUMP_VEL * p.gravityDir;
     p.onGround = false;
+    p.jumpsLeft--;
+    p.jumpPressed = true;
+  }
+  if (!jumpKey) {
+    p.jumpPressed = false;
   }
 
   // Gravity
@@ -72,6 +91,11 @@ export function updatePlayer(p: Player, dt: number, platforms: Rect[]) {
       }
       p.vy = 0;
     }
+  }
+
+  // Reset jumps when landing
+  if (p.onGround) {
+    p.jumpsLeft = MAX_JUMPS;
   }
 
   // Animation — only animate legs when moving on ground

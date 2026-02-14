@@ -1,7 +1,7 @@
 import { startGameLoop, keys, Rect, rectsOverlap, setupTouchInput } from "./engine";
 import { createPlayer, updatePlayer, Player } from "./player";
 import { LEVELS } from "./levels";
-import { drawPlayer, drawPlatform, drawDoor, drawPrincess, drawSpike, drawCRT, drawHeart, COLORS } from "./renderer";
+import { drawPlayer, drawPlatform, drawDoor, drawPrincess, drawSpike, drawCRT, drawHeart, drawBoostPad, COLORS } from "./renderer";
 import { drawStartScreen, drawDeathScreen, drawLevelIntro, drawLevelClear, drawHUD, drawFinale, DEATH_MESSAGES } from "./ui";
 import { initAudio, sfxJump, sfxDeath, sfxDoorReach, sfxLevelClear } from "./sound";
 import { initTraps, updateTraps, TrapState } from "./traps";
@@ -55,6 +55,10 @@ let wasOnGround = false;
 // Screen shake
 let shakeTimer = 0;
 
+// Level transition fade
+let fadeAlpha = 0;   // 0 = no fade, 1 = fully black
+let fadeDir = 0;     // 1 = fading out, -1 = fading in, 0 = idle
+
 // Death particles
 interface Particle {
   x: number; y: number;
@@ -100,6 +104,8 @@ function transitionTo(newState: GameState) {
 
   if (newState === "levelIntro") {
     loadLevel(currentLevel);
+    fadeAlpha = 1;   // start fully faded
+    fadeDir = -1;    // fade in
   }
 
   if (newState === "dead") {
@@ -126,6 +132,20 @@ function transitionTo(newState: GameState) {
   if (newState === "levelClear") {
     sfxDoorReach();
     sfxLevelClear();
+
+    // Spawn celebration particles around the door
+    for (let i = 0; i < 14; i++) {
+      const colors = [COLORS.playerHeart, COLORS.gold, COLORS.princess, "#f0c888"];
+      particles.push({
+        x: doorPos.x + 8 + (Math.random() - 0.5) * 40,
+        y: doorPos.y + 12,
+        vx: (Math.random() - 0.5) * 80,
+        vy: -50 - Math.random() * 80,
+        life: 1.5 + Math.random() * 1.0,
+        maxLife: 2.5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
+    }
   }
 
   if (newState === "finale") {
@@ -148,10 +168,10 @@ startGameLoop(
   // UPDATE
   (dt) => {
     stateTimer += dt;
+    startFrame++;
 
     switch (state) {
       case "start": {
-        startFrame++;
         if (anyKeyPressed) {
           anyKeyPressed = false;
           if (!audioInitialized) {
@@ -231,6 +251,10 @@ startGameLoop(
       }
 
       case "levelClear": {
+        // Start fading out at 1.5s, transition at 2s
+        if (stateTimer >= 1.5 && fadeDir === 0) {
+          fadeDir = 1; // start fading out
+        }
         if (stateTimer >= 2) {
           // Advance to next level or finale
           if (currentLevel + 1 < LEVELS.length) {
@@ -265,6 +289,13 @@ startGameLoop(
 
     // Update screen shake timer (always, outside switch)
     if (shakeTimer > 0) shakeTimer -= dt;
+
+    // Update level transition fade
+    if (fadeDir !== 0) {
+      fadeAlpha += fadeDir * dt * 2.5; // ~0.4s fade
+      if (fadeAlpha <= 0) { fadeAlpha = 0; fadeDir = 0; }
+      if (fadeAlpha >= 1) { fadeAlpha = 1; fadeDir = 0; }
+    }
 
     // Update death particles (always, outside switch)
     for (let i = particles.length - 1; i >= 0; i--) {
@@ -339,6 +370,13 @@ startGameLoop(
             ctx.font = "bold 14px monospace";
             ctx.textAlign = "center";
             ctx.fillText("Tebrikler!", GAME_W / 2, GAME_H / 2 - 20);
+          }
+        }
+
+        // Draw boost pads
+        for (const trap of trapStates) {
+          if (trap.def.type === "boost") {
+            drawBoostPad(ctx, trap.def.rect.x, trap.def.rect.y, trap.def.rect.w, trap.def.rect.h, startFrame);
           }
         }
 
@@ -424,6 +462,12 @@ startGameLoop(
       drawHeart(ctx, p.x - 4, p.y - 3, 2, p.color);
     }
     ctx.globalAlpha = 1;
+
+    // Level transition fade overlay
+    if (fadeAlpha > 0) {
+      ctx.fillStyle = `rgba(242, 232, 220, ${fadeAlpha})`;
+      ctx.fillRect(0, 0, GAME_W, GAME_H);
+    }
 
     // Restore screen shake transform
     if (shakeTimer > 0) {

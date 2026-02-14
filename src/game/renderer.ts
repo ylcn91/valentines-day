@@ -323,6 +323,45 @@ export function drawHeart(
   }
 }
 
+// ── drawBoostPad ─────────────────────────────────────────────────────
+// Arrow-shaped pad on the ground indicating speed boost.
+
+export function drawBoostPad(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  frame: number,
+): void {
+  // Pulsing glow
+  const pulse = 0.6 + Math.sin(frame * 0.1) * 0.4;
+
+  // Base pad
+  ctx.fillStyle = COLORS.gold;
+  ctx.globalAlpha = pulse;
+  ctx.fillRect(x, y, w, h);
+
+  // Arrow chevrons (>>)
+  ctx.fillStyle = "#fff";
+  ctx.globalAlpha = pulse * 0.8;
+  const midY = y + h / 2;
+  // First arrow
+  ctx.beginPath();
+  ctx.moveTo(x + 4, midY - 3);
+  ctx.lineTo(x + 8, midY);
+  ctx.lineTo(x + 4, midY + 3);
+  ctx.fill();
+  // Second arrow
+  ctx.beginPath();
+  ctx.moveTo(x + 10, midY - 3);
+  ctx.lineTo(x + 14, midY);
+  ctx.lineTo(x + 10, midY + 3);
+  ctx.fill();
+
+  ctx.globalAlpha = 1;
+}
+
 // ── drawCRT ──────────────────────────────────────────────────────────
 // Subtle CRT scanline overlay + vignette. Reduced opacity for cleaner look.
 

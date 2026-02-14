@@ -423,36 +423,47 @@ export function drawFinale(
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Main message
+    // Big title - "You found your princess!"
     ctx.globalAlpha = textProgress;
+    ctx.fillStyle = COLORS.playerHeart;
+    ctx.font = "bold 14px monospace";
+    ctx.fillText(
+      "Prensesine kavu\u015Ftun!",
+      w / 2,
+      h / 2 + 65,
+    );
+
+    // Main message
+    const msgProgress = Math.min(1, Math.max(0, (frame - 210) / 60));
+    ctx.globalAlpha = msgProgress;
     ctx.fillStyle = COLORS.text;
     ctx.font = "10px monospace";
     ctx.fillText(
       "Her engeli a\u015Ft\u0131m, \u00E7\u00FCnk\u00FC sonunda sen vars\u0131n.",
       w / 2,
-      h / 2 + 70,
+      h / 2 + 82,
     );
 
-    // Sub message (slightly delayed)
-    const subProgress = Math.min(1, Math.max(0, (frame - 210) / 60));
+    // Sub message
+    const subProgress = Math.min(1, Math.max(0, (frame - 250) / 60));
     ctx.globalAlpha = subProgress;
     ctx.fillStyle = COLORS.gold;
     ctx.font = "bold 11px monospace";
     ctx.fillText(
-      "Sevgililer G\u00FCn\u00FCn Kutlu Olsun, I\u015F\u0131l'\u0131m",
+      "Sevgililer G\u00FCn\u00FCn Kutlu Olsun, I\u015F\u0131l'\u0131m \u2764",
       w / 2,
-      h / 2 + 88,
+      h / 2 + 98,
     );
 
-    // Play again / letter prompt (after another beat)
-    const promptProgress = Math.min(1, Math.max(0, (frame - 270) / 60));
+    // Play again / letter prompt
+    const promptProgress = Math.min(1, Math.max(0, (frame - 310) / 60));
     ctx.globalAlpha = promptProgress;
     ctx.fillStyle = COLORS.textDim;
     ctx.font = "8px monospace";
     ctx.fillText(
       "Tekrar Oyna (R) | Mektuba Git (M)",
       w / 2,
-      h / 2 + 110,
+      h / 2 + 118,
     );
 
     ctx.globalAlpha = 1;

@@ -29,37 +29,41 @@
     #touch-controls {
       display: none;
       width: 100%;
-      max-width: 480px;
-      padding: 12px 16px;
+      padding: 16px 20px;
       justify-content: space-between;
       align-items: center;
-      margin-top: 10px;
+      margin-top: 12px;
+    }
+    /* Show on touch-capable devices */
+    @media (pointer: coarse) {
+      #touch-controls { display: flex; }
     }
     .touch-btn {
-      width: 56px;
-      height: 56px;
+      width: 64px;
+      height: 64px;
       background: #2a2a35;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       color: rgba(255,255,255,0.7);
-      font-size: 22px;
+      font-size: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px 0 #1a1a22;
+      box-shadow: 0 4px 0 #1a1a22;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
     .touch-btn:active {
       box-shadow: 0 1px 0 #1a1a22;
-      transform: translateY(2px);
+      transform: translateY(3px);
     }
     .btn-group {
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
     .touch-btn.jump {
-      width: 72px;
-      height: 56px;
+      width: 80px;
+      height: 64px;
     }
   </style>
 </head>

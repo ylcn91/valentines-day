@@ -144,6 +144,26 @@ export function updateTraps(
         break;
       }
 
+      case "boost": {
+        // Speed boost pad — launches player forward when they touch it
+        if (rectsOverlap(pRect, trap.def.rect) && !trap.triggered) {
+          trap.triggered = true;
+          sfxTrap();
+          // Boost player in the direction they're facing
+          const boostDir = player.facingRight ? 1 : -1;
+          player.boostVx = boostDir * 300;
+          // Small upward nudge
+          if (player.onGround) {
+            player.vy = -100 * player.gravityDir;
+          }
+        }
+        // Reset so it can be triggered again after player leaves
+        if (trap.triggered && !rectsOverlap(pRect, trap.def.rect)) {
+          trap.triggered = false;
+        }
+        break;
+      }
+
       case "fakeExit": {
         if (!trap.triggered && rectsOverlap(pRect, trap.def.rect)) {
           trap.triggered = true;

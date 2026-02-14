@@ -4,6 +4,7 @@ import { resolve } from "path";
 
 export default defineConfig({
   plugins: [react()],
+  base: "/valentines-day/",
   server: { host: true },
   build: {
     outDir: "dist",
