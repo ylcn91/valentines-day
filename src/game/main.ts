@@ -237,8 +237,8 @@ startGameLoop(
       }
 
       case "dead": {
-        // Brief delay before allowing keypress to respawn
-        if (stateTimer > 0.3) {
+        // Delay before allowing keypress to respawn
+        if (stateTimer > 1.2) {
           deathKeyReady = true;
         }
         if (deathKeyReady && anyKeyPressed) {
