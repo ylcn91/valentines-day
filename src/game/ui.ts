@@ -14,29 +14,10 @@ export const DEATH_MESSAGES = [
   "D\u00FC\u015Fmek normal, kalkmak a\u015Fk!",
 ];
 
-// ── Helper: draw a small pixel star ─────────────────────────────────
-function drawStar(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  size: number,
-  color: string,
-): void {
-  ctx.fillStyle = color;
-  // Vertical line
-  ctx.fillRect(cx, cy - size, 1, size * 2 + 1);
-  // Horizontal line
-  ctx.fillRect(cx - size, cy, size * 2 + 1, 1);
-  // Diagonal pixels
-  if (size >= 2) {
-    ctx.fillRect(cx - 1, cy - 1, 1, 1);
-    ctx.fillRect(cx + 1, cy - 1, 1, 1);
-    ctx.fillRect(cx - 1, cy + 1, 1, 1);
-    ctx.fillRect(cx + 1, cy + 1, 1, 1);
-  }
-}
+// ── Total levels (for progress indicator) ───────────────────────────
+const TOTAL_LEVELS = 5;
 
-// ── Helper: draw a tiny pixel skull ─────────────────────────────────
+// ── Helper: draw a small pixel skull ─────────────────────────────────
 function drawSkull(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -58,6 +39,25 @@ function drawSkull(
   ctx.fillRect(x + 3, y + 4, 1, 1);
 }
 
+// ── Helper: draw a small pixel star ─────────────────────────────────
+function drawStar(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  color: string,
+): void {
+  ctx.fillStyle = color;
+  ctx.fillRect(cx, cy - size, 1, size * 2 + 1);
+  ctx.fillRect(cx - size, cy, size * 2 + 1, 1);
+  if (size >= 2) {
+    ctx.fillRect(cx - 1, cy - 1, 1, 1);
+    ctx.fillRect(cx + 1, cy - 1, 1, 1);
+    ctx.fillRect(cx - 1, cy + 1, 1, 1);
+    ctx.fillRect(cx + 1, cy + 1, 1, 1);
+  }
+}
+
 // ── 1. Start Screen ─────────────────────────────────────────────────
 export function drawStartScreen(
   ctx: CanvasRenderingContext2D,
@@ -65,34 +65,32 @@ export function drawStartScreen(
   h: number,
   frame: number,
 ): void {
-  // Title
   ctx.save();
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Draw heart decorations flanking the title
-  drawHeart(ctx, w / 2 - 80, h / 2 - 60, 6, COLORS.playerHeart);
-  drawHeart(ctx, w / 2 + 62, h / 2 - 60, 6, COLORS.playerHeart);
-
-  // Title text
+  // Title text - bigger and bolder
   ctx.fillStyle = COLORS.text;
-  ctx.font = "bold 16px monospace";
+  ctx.font = "bold 20px monospace";
   ctx.fillText("I\u015F\u0131l\u2019a Ula\u015F", w / 2, h / 2 - 50);
+
+  // Minimal decorative line under title
+  ctx.fillStyle = COLORS.playerHeart;
+  ctx.fillRect(w / 2 - 40, h / 2 - 34, 80, 1);
 
   // Subtitle
   ctx.fillStyle = COLORS.textDim;
-  ctx.font = "10px monospace";
+  ctx.font = "9px monospace";
   ctx.fillText(
     "Sana ula\u015Fmak bu kadar zor olmamal\u0131yd\u0131...",
     w / 2,
-    h / 2 - 25,
+    h / 2 - 18,
   );
 
-  // Small decorative hearts below subtitle
-  drawHeart(ctx, w / 2 - 20, h / 2 - 10, 3, COLORS.princess);
-  drawHeart(ctx, w / 2 + 12, h / 2 - 10, 3, COLORS.princess);
+  // Single small heart below subtitle (minimal decoration)
+  drawHeart(ctx, w / 2 - 4, h / 2 - 2, 3, COLORS.playerHeart);
 
-  // Flashing prompt — pulsing opacity based on frame
+  // Flashing prompt - pulsing opacity based on frame
   const pulse = Math.abs(Math.sin(frame * 0.05));
   ctx.globalAlpha = 0.3 + pulse * 0.7;
   ctx.fillStyle = COLORS.gold;
@@ -120,26 +118,23 @@ export function drawDeathScreen(
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Death message (large, centered)
+  // Death message (centered)
   ctx.fillStyle = COLORS.text;
   ctx.font = "11px monospace";
-  ctx.fillText(message, w / 2, h / 2 - 20);
+  ctx.fillText(message, w / 2, h / 2 - 15);
 
-  // Death count with skull icon
-  drawSkull(ctx, w / 2 - 30, h / 2 + 8, COLORS.playerHeart);
+  // Death count - clean, centered below message
   ctx.fillStyle = COLORS.playerHeart;
-  ctx.font = "10px monospace";
-  ctx.textAlign = "left";
-  ctx.fillText("\u00D6l\u00FCm: " + deathCount, w / 2 - 22, h / 2 + 12);
+  ctx.font = "9px monospace";
+  ctx.fillText("\u2620 " + deathCount, w / 2, h / 2 + 10);
 
   // Prompt to continue
-  ctx.textAlign = "center";
   ctx.fillStyle = COLORS.textDim;
   ctx.font = "8px monospace";
   ctx.fillText(
     "Devam etmek i\u00E7in bir tu\u015Fa bas",
     w / 2,
-    h / 2 + 40,
+    h / 2 + 35,
   );
 
   ctx.restore();
@@ -167,25 +162,41 @@ export function drawLevelIntro(
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // "BOLUM X" header
-  ctx.fillStyle = COLORS.gold;
-  ctx.font = "bold 14px monospace";
-  ctx.fillText("B\u00D6L\u00DCM " + levelNum, w / 2, h / 2 - 30);
+  // Level progress squares at top
+  const sqSize = 8;
+  const sqGap = 4;
+  const totalW = TOTAL_LEVELS * sqSize + (TOTAL_LEVELS - 1) * sqGap;
+  const startX = (w - totalW) / 2;
+  const sqY = h / 2 - 55;
+
+  for (let i = 0; i < TOTAL_LEVELS; i++) {
+    const sx = startX + i * (sqSize + sqGap);
+    if (i < levelNum) {
+      // Completed or current level = filled
+      ctx.fillStyle = COLORS.gold;
+      ctx.fillRect(sx, sqY, sqSize, sqSize);
+    } else {
+      // Future level = outline
+      ctx.strokeStyle = COLORS.textDim;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sx + 0.5, sqY + 0.5, sqSize - 1, sqSize - 1);
+    }
+  }
 
   // Level name
   ctx.fillStyle = COLORS.text;
-  ctx.font = "11px monospace";
-  ctx.fillText(name, w / 2, h / 2);
+  ctx.font = "bold 13px monospace";
+  ctx.fillText(name, w / 2, h / 2 - 10);
 
   // Subtitle
   ctx.fillStyle = COLORS.textDim;
   ctx.font = "9px monospace";
-  ctx.fillText(subtitle, w / 2, h / 2 + 20);
+  ctx.fillText(subtitle, w / 2, h / 2 + 12);
 
-  // Small decorative line
+  // Minimal decorative line
   ctx.fillStyle = COLORS.playerHeart;
   const lineW = 60 * progress;
-  ctx.fillRect(w / 2 - lineW / 2, h / 2 - 14, lineW, 1);
+  ctx.fillRect(w / 2 - lineW / 2, h / 2 - 22, lineW, 1);
 
   ctx.globalAlpha = 1;
   ctx.restore();
@@ -240,28 +251,43 @@ export function drawLevelClear(
 }
 
 // ── 5. HUD ──────────────────────────────────────────────────────────
+// Level Devil style: progress squares at top center, death count top-left.
 export function drawHUD(
   ctx: CanvasRenderingContext2D,
   levelNum: number,
   deathCount: number,
 ): void {
   ctx.save();
-
   ctx.globalAlpha = 0.7;
-  ctx.textBaseline = "top";
 
-  // Top-left: level indicator
+  // ── TOP CENTER: Level progress as filled/empty squares ──
+  const sqSize = 8;
+  const sqGap = 4;
+  const totalW = TOTAL_LEVELS * sqSize + (TOTAL_LEVELS - 1) * sqGap;
+  const startX = (480 - totalW) / 2;
+  const sqY = 6;
+
+  for (let i = 0; i < TOTAL_LEVELS; i++) {
+    const sx = startX + i * (sqSize + sqGap);
+    if (i < levelNum) {
+      // Completed or current level = filled square
+      ctx.fillStyle = COLORS.gold;
+      ctx.fillRect(sx, sqY, sqSize, sqSize);
+    } else {
+      // Future level = empty/outline square
+      ctx.strokeStyle = COLORS.textDim;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sx + 0.5, sqY + 0.5, sqSize - 1, sqSize - 1);
+    }
+  }
+
+  // ── TOP-LEFT: Death counter ──
+  drawSkull(ctx, 8, 5, COLORS.text);
+  ctx.fillStyle = COLORS.text;
+  ctx.font = "8px monospace";
   ctx.textAlign = "left";
-  ctx.fillStyle = COLORS.text;
-  ctx.font = "8px monospace";
-  ctx.fillText("B\u00F6l\u00FCm " + levelNum, 6, 6);
-
-  // Top-right: death counter with skull
-  ctx.textAlign = "right";
-  drawSkull(ctx, 480 - 40, 5, COLORS.text);
-  ctx.fillStyle = COLORS.text;
-  ctx.font = "8px monospace";
-  ctx.fillText("" + deathCount, 480 - 8, 6);
+  ctx.textBaseline = "top";
+  ctx.fillText("" + deathCount, 16, 6);
 
   ctx.globalAlpha = 1;
   ctx.restore();
@@ -285,11 +311,11 @@ export function drawFinale(
   ctx.fillStyle = COLORS.platform;
   ctx.fillRect(0, groundY, w, 4);
 
-  // Character positions — they walk toward center
+  // Character positions -- they walk toward center
   const centerX = w / 2;
   const charY = groundY - 16; // player sprite is 16px tall
 
-  // Phase 1: frames 0-120 — characters walk toward center
+  // Phase 1: frames 0-120 -- characters walk toward center
   if (frame <= 120) {
     const progress = Math.min(1, frame / 120);
     // Ease-out for smooth arrival
@@ -312,7 +338,7 @@ export function drawFinale(
     drawPrincess(ctx, Math.floor(princessX), Math.floor(charY), princessFrame);
   }
 
-  // Phase 2: frames 120-180 — they meet, hearts burst
+  // Phase 2: frames 120-180 -- they meet, hearts burst
   if (frame > 120 && frame <= 180) {
     // Characters standing together in the center
     const player = createPlayer(
@@ -355,7 +381,7 @@ export function drawFinale(
     ctx.globalAlpha = 1;
   }
 
-  // Phase 3: frame 180+ — characters stay, text fades in
+  // Phase 3: frame 180+ -- characters stay, text fades in
   if (frame > 180) {
     // Characters standing together
     const player = createPlayer(
