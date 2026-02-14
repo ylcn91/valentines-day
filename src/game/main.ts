@@ -150,6 +150,8 @@ function transitionTo(newState: GameState) {
 
   if (newState === "finale") {
     finaleFrame = 0;
+    fadeAlpha = 1;   // start fully faded
+    fadeDir = -1;    // fade in to reveal finale
   }
 }
 
@@ -270,16 +272,11 @@ startGameLoop(
       case "finale": {
         finaleFrame++;
 
-        // R key → restart
-        if (keys["KeyR"]) {
+        // R key or tap (after text fully shown) → restart
+        if (keys["KeyR"] || (finaleFrame > 350 && anyKeyPressed)) {
           currentLevel = 0;
           deathCount = 0;
           transitionTo("levelIntro");
-        }
-
-        // M key → go to letter page
-        if (keys["KeyM"]) {
-          window.location.href = "/";
         }
 
         anyKeyPressed = false;

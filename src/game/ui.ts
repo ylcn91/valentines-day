@@ -461,7 +461,7 @@ export function drawFinale(
     ctx.fillStyle = COLORS.textDim;
     ctx.font = "8px monospace";
     ctx.fillText(
-      "Tekrar Oyna (R)",
+      "Tekrar Oyna",
       w / 2,
       h / 2 + 118,
     );
